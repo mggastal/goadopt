@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AdOpt — Estrutura Google Ads</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e17;
+    --surface: #111827;
+    --surface2: #1a2236;
+    --border: rgba(255,255,255,0.07);
+    --border-strong: rgba(255,255,255,0.14);
+    --text: #f0f4ff;
+    --muted: #6b7a99;
+    --accent-blue: #3b82f6;
+    --accent-green: #10b981;
+    --accent-amber: #f59e0b;
+    --accent-purple: #8b5cf6;
+    --accent-pink: #ec4899;
+    --accent-teal: #14b8a6;
+    --font-display: 'Syne', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    padding: 48px 48px 32px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+  }
+  .header-left { flex: 1; }
+  .brand-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent-teal);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .brand-tag span { width: 20px; height: 1px; background: var(--accent-teal); display: inline-block; }
+  .header h1 {
+    font-family: var(--font-display);
+    font-size: 36px;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+  .header h1 em { font-style: normal; color: var(--accent-teal); }
+  .header-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .header-meta strong { color: var(--text); }
+
+  /* LAYOUT */
+  .main { padding: 40px 48px; }
+  .section { margin-bottom: 48px; }
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* CAMPANHA CARDS */
+  .campaign-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0,1fr));
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+  .camp-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+  .camp-card:hover { border-color: var(--border-strong); }
+  .camp-header {
+    padding: 20px 20px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .camp-type {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .camp-title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+  .camp-body { padding: 16px 20px; }
+  .camp-section-name {
+    font-size: 10px;
+    font-family: var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+    margin-top: 14px;
+  }
+  .camp-section-name:first-child { margin-top: 0; }
+  .tag-group { display: flex; flex-wrap: wrap; gap: 5px; }
+  .tag {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid;
+    font-family: var(--font-mono);
+    white-space: nowrap;
+  }
+  .tag-match {
+    font-size: 9px;
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-family: var(--font-mono);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .badge-objetivo {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-family: var(--font-mono);
+    margin-top: 10px;
+  }
+
+  /* COLORS per campaign */
+  .c-search  { --cc: var(--accent-blue); }
+  .c-pmax    { --cc: var(--accent-green); }
+  .c-demgen  { --cc: var(--accent-purple); }
+  .c-smart   { --cc: var(--accent-amber); }
+
+  .camp-card { border-top: 3px solid var(--cc); }
+  .camp-type { color: var(--cc); }
+  .tag { border-color: color-mix(in srgb, var(--cc) 30%, transparent); background: color-mix(in srgb, var(--cc) 8%, transparent); color: var(--cc); }
+  .badge-objetivo { background: color-mix(in srgb, var(--cc) 12%, transparent); color: var(--cc); border: 1px solid color-mix(in srgb, var(--cc) 25%, transparent); }
+
+  .tag-neg { border-color: rgba(239,68,68,0.3); background: rgba(239,68,68,0.06); color: #f87171; }
+  .tag-match-exata { background: rgba(59,130,246,0.15); color: #93c5fd; }
+  .tag-match-frase { background: rgba(139,92,246,0.15); color: #c4b5fd; }
+  .tag-match-ampla { background: rgba(245,158,11,0.15); color: #fcd34d; }
+
+  /* MIND MAP / FLOW */
+  .flow-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+    overflow-x: auto;
+  }
+  .flow-root {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+  .flow-root-node {
+    background: linear-gradient(135deg, #1e3a5f, #1a2a4a);
+    border: 1px solid rgba(59,130,246,0.4);
+    border-radius: 10px;
+    padding: 12px 28px;
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 700;
+    color: #93c5fd;
+    letter-spacing: 0.02em;
+    position: relative;
+  }
+  .flow-connector-v {
+    width: 2px;
+    height: 24px;
+    background: var(--border-strong);
+    margin: 0 auto;
+  }
+  .flow-row {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0,1fr));
+    gap: 12px;
+    width: 100%;
+  }
+  .flow-branch {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .flow-connector-h-wrap {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    position: relative;
+    height: 24px;
+  }
+  .flow-connector-h-wrap::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0; right: 0;
+    height: 2px;
+    background: var(--border-strong);
+    transform: translateY(-50%);
+  }
+  .flow-node {
+    border-radius: 10px;
+    padding: 14px 16px;
+    width: 100%;
+    border: 1px solid;
+    position: relative;
+  }
+  .flow-node-title {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .flow-node-sub {
+    font-size: 10px;
+    font-family: var(--font-mono);
+    opacity: 0.7;
+  }
+  .fn-search { background: rgba(59,130,246,0.08); border-color: rgba(59,130,246,0.35); }
+  .fn-search .flow-node-title { color: #60a5fa; }
+  .fn-pmax { background: rgba(16,185,129,0.08); border-color: rgba(16,185,129,0.35); }
+  .fn-pmax .flow-node-title { color: #34d399; }
+  .fn-demgen { background: rgba(139,92,246,0.08); border-color: rgba(139,92,246,0.35); }
+  .fn-demgen .flow-node-title { color: #a78bfa; }
+  .fn-smart { background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.35); }
+  .fn-smart .flow-node-title { color: #fbbf24; }
+
+  .flow-connector-down { width: 2px; height: 16px; margin: 0 auto; }
+  .fc-blue { background: rgba(59,130,246,0.4); }
+  .fc-green { background: rgba(16,185,129,0.4); }
+  .fc-purple { background: rgba(139,92,246,0.4); }
+  .fc-amber { background: rgba(245,158,11,0.4); }
+
+  .flow-sub-group { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+  .flow-sub-node {
+    border-radius: 8px;
+    padding: 10px 14px;
+    border: 1px solid;
+    font-size: 11px;
+  }
+  .fsn-search { background: rgba(59,130,246,0.05); border-color: rgba(59,130,246,0.2); color: #93c5fd; }
+  .fsn-pmax { background: rgba(16,185,129,0.05); border-color: rgba(16,185,129,0.2); color: #6ee7b7; }
+  .fsn-demgen { background: rgba(139,92,246,0.05); border-color: rgba(139,92,246,0.2); color: #c4b5fd; }
+  .fsn-smart { background: rgba(245,158,11,0.05); border-color: rgba(245,158,11,0.2); color: #fcd34d; }
+  .flow-sub-node strong { display: block; font-size: 11px; margin-bottom: 2px; font-family: var(--font-mono); }
+  .flow-sub-node span { font-size: 10px; opacity: 0.75; }
+
+  /* AD MODELS */
+  .ad-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .ad-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .ad-card-header {
+    padding: 14px 18px 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .ad-card-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .ad-card-type {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: rgba(59,130,246,0.1);
+    color: #60a5fa;
+    border: 1px solid rgba(59,130,246,0.25);
+  }
+  .ad-preview {
+    padding: 18px;
+    background: #fff;
+    margin: 16px 18px;
+    border-radius: 8px;
+    font-family: Arial, sans-serif;
+  }
+  .ad-url { font-size: 12px; color: #202124; margin-bottom: 2px; }
+  .ad-url span { color: #006621; }
+  .ad-headline { font-size: 18px; color: #1a0dab; line-height: 1.3; margin-bottom: 4px; cursor: pointer; }
+  .ad-headline:hover { text-decoration: underline; }
+  .ad-desc { font-size: 13px; color: #4d5156; line-height: 1.4; }
+  .ad-titles-list { padding: 0 18px 14px; }
+  .ad-titles-list p { font-size: 11px; color: var(--muted); margin-bottom: 8px; font-family: var(--font-mono); letter-spacing: 0.05em; text-transform: uppercase; }
+  .titles-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+  .title-pill {
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: var(--surface2);
+    border: 1px solid var(--border-strong);
+    color: var(--text);
+    font-family: var(--font-mono);
+  }
+  .title-pill.highlight { background: rgba(59,130,246,0.1); border-color: rgba(59,130,246,0.3); color: #93c5fd; }
+
+  /* KEYWORDS TABLE */
+  .kw-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .kw-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .kw-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .kw-list { padding: 14px 18px; display: flex; flex-direction: column; gap: 6px; }
+  .kw-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    font-family: var(--font-mono);
+  }
+  .kw-item:last-child { border-bottom: none; }
+  .kw-word { color: var(--text); }
+  .kw-neg-section .kw-word { color: #f87171; }
+
+  /* FOOTER */
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: 24px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--muted);
+    font-size: 11px;
+    font-family: var(--font-mono);
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="brand-tag"><span></span>Google Ads — Plano Estratégico</div>
+    <h1>Estrutura de Campanhas<br><em>AdOpt</em> 2026</h1>
+  </div>
+  <div class="header-meta">
+    <div>Produto <strong>Plataforma CMP / LGPD</strong></div>
+    <div>Mercado <strong>Brasil — PT-BR</strong></div>
+    <div>Canais <strong>Search · PMAX · Demand Gen · Smart</strong></div>
+    <div>Investimento <strong>R$ 2.000 / mês</strong></div>
+    <div>Elaborado <strong>Abril 2026</strong></div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- MAPA MENTAL / ESTRUTURA -->
+  <div class="section">
+    <div class="section-label">01 — Arquitetura de Campanhas</div>
+    <div class="flow-wrap">
+      <div class="flow-root">
+        <div class="flow-root-node">AdOpt — Google Ads</div>
+        <div class="flow-connector-v"></div>
+        <div class="flow-row">
+
+          <!-- SEARCH -->
+          <div class="flow-branch">
+            <div class="flow-node fn-search" style="width:100%">
+              <div class="flow-node-title">Search</div>
+              <div class="flow-node-sub">70% do investimento · R$ 1.400</div>
+            </div>
+            <div class="flow-connector-down fc-blue"></div>
+            <div class="flow-sub-group">
+              <div class="flow-sub-node fsn-search">
+                <strong>Institucional</strong>
+                <span>adopt · adopt cookies · CMP · gestão de consentimento</span>
+              </div>
+              <div class="flow-sub-node fsn-search">
+                <strong>Genéricas</strong>
+                <span>política de cookies · banner de cookies · adequação lgpd · ferramenta lgpd · plataforma lgpd</span>
+              </div>
+              <div class="flow-sub-node fsn-search">
+                <strong>Concorrentes</strong>
+                <span style="font-style:italic;opacity:0.5">— palavras-chave a definir —</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- PMAX -->
+          <div class="flow-branch">
+            <div class="flow-node fn-pmax" style="width:100%">
+              <div class="flow-node-title">PMAX</div>
+              <div class="flow-node-sub">Todos os canais</div>
+            </div>
+            <div class="flow-connector-down fc-green"></div>
+            <div class="flow-sub-group">
+              <div class="flow-sub-node fsn-pmax">
+                <strong>Asset Group — Cookies</strong>
+                <span>Títulos + desc. foco em banner / aviso</span>
+              </div>
+              <div class="flow-sub-node fsn-pmax">
+                <strong>Asset Group — LGPD</strong>
+                <span>Títulos + desc. foco em adequação LGPD</span>
+              </div>
+              <div class="flow-sub-node fsn-pmax">
+                <strong>Audiência qualificada</strong>
+                <span>Visitantes LP · Convertidos · Similares</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- DEMAND GEN -->
+          <div class="flow-branch">
+            <div class="flow-node fn-demgen" style="width:100%">
+              <div class="flow-node-title">Demand Gen</div>
+              <div class="flow-node-sub">YouTube + Discovery</div>
+            </div>
+            <div class="flow-connector-down fc-purple"></div>
+            <div class="flow-sub-group">
+              <div class="flow-sub-node fsn-demgen">
+                <strong>Lookalike — Convertidos</strong>
+                <span>Similar a quem já converteu na LP</span>
+              </div>
+              <div class="flow-sub-node fsn-demgen">
+                <strong>Lookalike — Visitantes</strong>
+                <span>Similar a visitantes dos últimos 90 dias</span>
+              </div>
+              <div class="flow-sub-node fsn-demgen">
+                <strong>Remarketing leve</strong>
+                <span>Visitantes do site que não converteram</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- SMART -->
+          <div class="flow-branch">
+            <div class="flow-node fn-smart" style="width:100%">
+              <div class="flow-node-title">Smart</div>
+              <div class="flow-node-sub">Automação total</div>
+            </div>
+            <div class="flow-connector-down fc-amber"></div>
+            <div class="flow-sub-group">
+              <div class="flow-sub-node fsn-smart">
+                <strong>Remarketing</strong>
+                <span>Usuários que entraram no site e não converteram</span>
+              </div>
+              <div class="flow-sub-node fsn-smart">
+                <strong>Canais</strong>
+                <span>Gmail · Display · YouTube</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PALAVRAS-CHAVE -->
+  <div class="section">
+    <div class="section-label">02 — Palavras-chave (PT-BR)</div>
+    <div class="kw-grid">
+
+      <!-- INSTITUCIONAL -->
+      <div class="kw-card">
+        <div class="kw-header" style="color:#60a5fa">Institucional <span style="font-size:11px;color:var(--muted);font-weight:400;font-family:var(--font-mono)">— branded + awareness</span></div>
+        <div class="kw-list">
+          <div class="kw-item"><span class="kw-word">[adopt]</span><span class="tag-match tag-match-exata">exata</span></div>
+          <div class="kw-item"><span class="kw-word">[adopt cookies]</span><span class="tag-match tag-match-exata">exata</span></div>
+          <div class="kw-item"><span class="kw-word">[goadopt]</span><span class="tag-match tag-match-exata">exata</span></div>
+          <div class="kw-item"><span class="kw-word">"CMP lgpd"</span><span class="tag-match tag-match-frase">frase</span></div>
+          <div class="kw-item"><span class="kw-word">"gestão de consentimento"</span><span class="tag-match tag-match-frase">frase</span></div>
+          <div class="kw-item"><span class="kw-word">"consent management platform"</span><span class="tag-match tag-match-frase">frase</span></div>
+          <div class="kw-item"><span class="kw-word">plataforma cmp lgpd</span><span class="tag-match tag-match-ampla">ampla mod.</span></div>
+        </div>
+      </div>
+
+      <!-- GENÉRICAS -->
+      <div class="kw-card">
+        <div class="kw-header" style="color:#34d399">Genéricas <span style="font-size:11px;color:var(--muted);font-weight:400;font-family:var(--font-mono)">— cookies + LGPD</span></div>
+        <div class="kw-list">
+          <div class="kw-item"><span class="kw-word">[aviso de cookies]</span><span class="tag-match tag-match-exata">exata</span></div>
+          <div class="kw-item"><span class="kw-word">[banner de cookies]</span><span class="tag-match tag-match-exata">exata</span></div>
+          <div class="kw-item"><span class="kw-word">[política de cookies site]</span><span class="tag-match tag-match-exata">exata</span></div>
+          <div class="kw-item"><span class="kw-word">[ferramenta lgpd]</span><span class="tag-match tag-match-exata">exata</span></div>
+          <div class="kw-item"><span class="kw-word">[adequação lgpd site]</span><span class="tag-match tag-match-exata">exata</span></div>
+          <div class="kw-item"><span class="kw-word">"criar aviso de cookies"</span><span class="tag-match tag-match-frase">frase</span></div>
+          <div class="kw-item"><span class="kw-word">"consentimento de cookies"</span><span class="tag-match tag-match-frase">frase</span></div>
+          <div class="kw-item"><span class="kw-word">"software adequação lgpd"</span><span class="tag-match tag-match-frase">frase</span></div>
+          <div class="kw-item"><span class="kw-word">"plataforma lgpd"</span><span class="tag-match tag-match-frase">frase</span></div>
+          <div class="kw-item"><span class="kw-word">ferramenta aviso cookies site</span><span class="tag-match tag-match-ampla">ampla mod.</span></div>
+          <div class="kw-item"><span class="kw-word">como adequar site lgpd</span><span class="tag-match tag-match-ampla">ampla mod.</span></div>
+          <div class="kw-item"><span class="kw-word">sistema cookies site</span><span class="tag-match tag-match-ampla">ampla mod.</span></div>
+        </div>
+      </div>
+
+      <!-- CONCORRENTES -->
+      <div class="kw-card">
+        <div class="kw-header" style="color:#f59e0b">Concorrentes <span style="font-size:11px;color:var(--muted);font-weight:400;font-family:var(--font-mono)">— a definir</span></div>
+        <div class="kw-list">
+          <div style="padding: 20px 0; text-align: center; color: var(--muted); font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.05em;">
+            — estrutura criada —<br>palavras-chave a preencher
+          </div>
+        </div>
+      </div>
+
+      <!-- NEGATIVAS -->
+      <div class="kw-card kw-neg-section" style="grid-column: span 3">
+        <div class="kw-header" style="color:#f87171">Palavras Negativas — Excluir de todas as campanhas</div>
+        <div class="kw-list">
+          <div style="display:flex;flex-wrap:wrap;gap:6px;padding: 4px 0 8px;">
+            <span class="tag tag-neg">o que é</span>
+            <span class="tag tag-neg">como funciona</span>
+            <span class="tag tag-neg">curso</span>
+            <span class="tag tag-neg">grátis</span>
+            <span class="tag tag-neg">definição</span>
+            <span class="tag tag-neg">lei 13709</span>
+            <span class="tag tag-neg">multa</span>
+            <span class="tag tag-neg">certificação</span>
+            <span class="tag tag-neg">emprego</span>
+            <span class="tag tag-neg">advogado</span>
+            <span class="tag tag-neg">receita</span>
+            <span class="tag tag-neg">deletar</span>
+            <span class="tag tag-neg">limpar cache</span>
+            <span class="tag tag-neg">fraude</span>
+            <span class="tag tag-neg">datenschutzerklärung</span>
+            <span class="tag tag-neg">gdpr</span>
+            <span class="tag tag-neg">wordpress plugin</span>
+          </div>
+          <div style="font-size:10px;color:var(--muted);font-family:var(--font-mono);margin-top:4px;">
+            ⚠ Adicionar concorrentes (cookiebot, cookieyes, iubenda, termly) como negativas nas campanhas não-Concorrentes · Segmentação geográfica: "presença confirmada" apenas no Brasil
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODELOS DE ANÚNCIO -->
+  <div class="section">
+    <div class="section-label">03 — Modelos de Anúncio (Search RSA)</div>
+    <div class="ad-grid">
+
+      <!-- ANÚNCIO 1 — GENÉRICAS COOKIES -->
+      <div class="ad-card">
+        <div class="ad-card-header">
+          <span class="ad-card-label">Grupo: Genéricas — Aviso de Cookies</span>
+          <span class="ad-card-type">RSA · Search</span>
+        </div>
+        <div class="ad-preview">
+          <div class="ad-url">goadopt.io ▾</div>
+          <div class="ad-headline">Gerador de Aviso de Cookies · Evite Multas da LGPD</div>
+          <div class="ad-desc">Crie e publique seu aviso de cookies em menos de 10 minutos. Aprovado pelo Google. Adeque seu site agora.</div>
+        </div>
+        <div class="ad-titles-list">
+          <p>Pool de títulos</p>
+          <div class="titles-grid">
+            <span class="title-pill highlight">Gerador de Aviso de Cookies</span>
+            <span class="title-pill highlight">Evite Multas da LGPD</span>
+            <span class="title-pill highlight">Adeque seu Site Agora</span>
+            <span class="title-pill">Aprovado pelo Google</span>
+            <span class="title-pill">Instale em 10 Minutos</span>
+            <span class="title-pill">LGPD e Aviso de Cookies</span>
+            <span class="title-pill">Faça seu Aviso de Cookies</span>
+            <span class="title-pill">Sistema de LGPD Completo</span>
+          </div>
+          <p style="margin-top:10px">Descrições</p>
+          <div class="titles-grid">
+            <span class="title-pill">Crie, customize e publique sua política de cookies em minutos. Torne seu site adequado agora.</span>
+            <span class="title-pill">Política de cookies atualizada. A solução fácil e rápida para o seu site. Experimente grátis.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ANÚNCIO 2 — GENÉRICAS LGPD -->
+      <div class="ad-card">
+        <div class="ad-card-header">
+          <span class="ad-card-label">Grupo: Genéricas — Adequação LGPD</span>
+          <span class="ad-card-type">RSA · Search</span>
+        </div>
+        <div class="ad-preview">
+          <div class="ad-url">goadopt.io ▾</div>
+          <div class="ad-headline">Adequação LGPD em 10 Min · Plataforma Completa</div>
+          <div class="ad-desc">Gestão de consentimentos, aviso de cookies e conformidade com 40+ leis. Mais de 50.000 sites adequados. Comece grátis.</div>
+        </div>
+        <div class="ad-titles-list">
+          <p>Pool de títulos</p>
+          <div class="titles-grid">
+            <span class="title-pill highlight">Adeque seu Site à LGPD</span>
+            <span class="title-pill highlight">Plataforma de Consentimentos</span>
+            <span class="title-pill highlight">Comece Grátis Agora</span>
+            <span class="title-pill">50.000 Sites Adequados</span>
+            <span class="title-pill">40+ Legislações Cobertas</span>
+            <span class="title-pill">Gestão de Consentimentos</span>
+            <span class="title-pill">Ferramenta LGPD Completa</span>
+            <span class="title-pill">Melhor CMP segundo G2</span>
+            <span class="title-pill">Suporte Humanizado</span>
+          </div>
+          <p style="margin-top:10px">Descrições</p>
+          <div class="titles-grid">
+            <span class="title-pill">Adeque seus sites com a melhor plataforma de gestão de cookies e consentimentos. Atenda 40+ legislações.</span>
+            <span class="title-pill">Geramos a sua política de cookies personalizada em segundos. A única tecnologia aprovada pela Google.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ANÚNCIO 3 — INSTITUCIONAL -->
+      <div class="ad-card">
+        <div class="ad-card-header">
+          <span class="ad-card-label">Grupo: Institucional — AdOpt</span>
+          <span class="ad-card-type">RSA · Search</span>
+        </div>
+        <div class="ad-preview">
+          <div class="ad-url">goadopt.io ▾</div>
+          <div class="ad-headline">AdOpt — Aviso de Cookies · Melhor CMP do Brasil</div>
+          <div class="ad-desc">A plataforma CMP mais fácil de usar segundo o G2. Adequação LGPD em minutos. Mais de 50.000 sites protegidos.</div>
+        </div>
+        <div class="ad-titles-list">
+          <p>Pool de títulos</p>
+          <div class="titles-grid">
+            <span class="title-pill highlight">AdOpt</span>
+            <span class="title-pill highlight">Aviso de Cookies Oficial</span>
+            <span class="title-pill highlight">Melhor CMP — G2 Award</span>
+            <span class="title-pill">50.000+ Sites Protegidos</span>
+            <span class="title-pill">Planos a partir de Grátis</span>
+            <span class="title-pill">Suporte via Chat</span>
+            <span class="title-pill">Fale com Especialista</span>
+            <span class="title-pill">Experimente Grátis</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ANÚNCIO 4 — DEMAND GEN -->
+      <div class="ad-card">
+        <div class="ad-card-header">
+          <span class="ad-card-label">Demand Gen — YouTube (criativos)</span>
+          <span class="ad-card-type">In-stream · Video</span>
+        </div>
+        <div style="padding: 18px;">
+          <div style="background:var(--surface2);border-radius:8px;padding:16px;border:1px solid var(--border);">
+            <div style="font-size:10px;font-family:var(--font-mono);color:var(--muted);margin-bottom:10px;letter-spacing:0.08em;text-transform:uppercase">Diretrizes de criativo</div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div style="display:flex;gap:10px;align-items:flex-start">
+                <span style="font-family:var(--font-mono);font-size:10px;color:var(--accent-purple);min-width:48px">Audiência</span>
+                <span style="font-size:12px;color:var(--text)">Lookalike de convertidos e visitantes · Remarketing de visitantes do site</span>
+              </div>
+              <div style="display:flex;gap:10px;align-items:flex-start">
+                <span style="font-family:var(--font-mono);font-size:10px;color:var(--accent-purple);min-width:48px">Mensagem</span>
+                <span style="font-size:12px;color:var(--text)">Foco em adequação LGPD simples e rápida — reforço de marca para quem já conhece</span>
+              </div>
+              <div style="display:flex;gap:10px;align-items:flex-start">
+                <span style="font-family:var(--font-mono);font-size:10px;color:var(--accent-purple);min-width:48px">CTA</span>
+                <span style="font-size:12px;color:var(--text)">Comece grátis em goadopt.io</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <span>AdOpt · Estrutura Google Ads · 2026</span>
+  <span>Search · PMAX · Demand Gen · Smart — PT-BR apenas</span>
+  <span>Investimento: R$ 2.000 · Search 70%</span>
+</div>
+
+</body>
+</html>
